@@ -1,67 +1,76 @@
 <template>
   <div class="container">
+    <h1>Nuxt</h1>
     <div>
-      <logo />
-      <h1 class="title">
-        nuxt-validation
-      </h1>
-      <h2 class="subtitle">
-        My majestic Nuxt.js project
-      </h2>
-      <div class="links">
-        <a href="https://nuxtjs.org/" target="_blank" class="button--green"
-          >Documentation</a
-        >
-        <a
-          href="https://github.com/nuxt/nuxt.js"
-          target="_blank"
-          class="button--grey"
-          >GitHub</a
-        >
-      </div>
+      <select v-model="selectHand" name="hand">
+        <option value="">未選択</option>
+        <option>グー</option>
+        <option>チョキ</option>
+        <option>パー</option>
+        <option>ほげ</option>
+      </select>
+      <p>選択中：{{ selectHand }}</p>
+    </div>
+    <button @click="setHand">手をセットする</button>
+    <div v-if="hand" class="result">
+      <p>{{ hand }}を出した！</p>
+    </div>
+    <div v-else class="result">
+      <p>不正な値です！</p>
+    </div>
+    <div>
+      <input v-model="test" type="text" />
+      <p>{{ computedTest }}</p>
+      <p>{{ testTest }}</p>
     </div>
   </div>
 </template>
 
 <script>
-import Logo from '~/components/Logo.vue'
+// import Logo from '~/components/Logo.vue'
 
 export default {
-  components: {
-    Logo
+  components: {},
+  data() {
+    return {
+      selectHand: '',
+      hand: false,
+      test: 'aaaa',
+      testTest: 'sss'
+    }
+  },
+  computed: {
+    computedTest: {
+      set(newVal) {
+        console.log(newVal + newVal)
+        this.testTest = newVal + newVal
+      },
+      get() {
+        return this.test + 'です'
+      }
+    }
+  },
+  methods: {
+    setHand() {
+      if (/^(グー|チョキ|パー)$/.test(this.hand)) {
+        this.hand = this.selectHand
+      } else {
+        this.hand = false
+      }
+    }
   }
 }
 </script>
 
-<style>
+<style lang="scss" scoped>
+* {
+  font-size: 16px;
+  padding: 10px;
+  margin: 10px;
+}
 .container {
-  margin: 0 auto;
-  min-height: 100vh;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  text-align: center;
-}
-
-.title {
-  font-family: 'Quicksand', 'Source Sans Pro', -apple-system, BlinkMacSystemFont,
-    'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-  display: block;
-  font-weight: 300;
-  font-size: 100px;
-  color: #35495e;
-  letter-spacing: 1px;
-}
-
-.subtitle {
-  font-weight: 300;
-  font-size: 42px;
-  color: #526488;
-  word-spacing: 5px;
-  padding-bottom: 15px;
-}
-
-.links {
-  padding-top: 15px;
+  h1 {
+    font-weight: normal;
+  }
 }
 </style>
