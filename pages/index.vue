@@ -2,26 +2,19 @@
   <div class="container">
     <h1>Nuxt</h1>
     <div>
-      <select v-model="selectHand" name="hand">
-        <option value="">未選択</option>
+      <select v-model="selectHand" name="selectHand">
         <option>グー</option>
         <option>チョキ</option>
         <option>パー</option>
         <option>ほげ</option>
       </select>
-      <p>選択中：{{ selectHand }}</p>
+      <button @click="setHand">値をセット</button>
     </div>
-    <button @click="setHand">手をセットする</button>
     <div v-if="hand" class="result">
       <p>{{ hand }}を出した！</p>
     </div>
     <div v-else class="result">
       <p>不正な値です！</p>
-    </div>
-    <div>
-      <input v-model="test" type="text" />
-      <p>{{ computedTest }}</p>
-      <p>{{ testTest }}</p>
     </div>
   </div>
 </template>
@@ -33,30 +26,28 @@ export default {
   components: {},
   data() {
     return {
-      selectHand: '',
-      hand: false,
-      test: 'aaaa',
-      testTest: 'sss'
+      selectHand: 'グー',
+      hand: 'グー'
     }
   },
   computed: {
-    computedTest: {
-      set(newVal) {
-        console.log(newVal + newVal)
-        this.testTest = newVal + newVal
-      },
+    computedHand: {
       get() {
-        return this.test + 'です'
+        return this.hand
+      },
+      set(newVal) {
+        if (/^(グー|チョキ|パー)$/.test(newVal)) {
+          this.hand = newVal
+          console.log(this.hand)
+        } else {
+          this.hand = false
+        }
       }
     }
   },
   methods: {
     setHand() {
-      if (/^(グー|チョキ|パー)$/.test(this.hand)) {
-        this.hand = this.selectHand
-      } else {
-        this.hand = false
-      }
+      this.computedHand = this.selectHand
     }
   }
 }
@@ -72,5 +63,8 @@ export default {
   h1 {
     font-weight: normal;
   }
+}
+.error {
+  color: red;
 }
 </style>
