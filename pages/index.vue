@@ -37,7 +37,8 @@ export default {
       ballHalf: 0,
       ballX: '50%',
       ballY: '50%',
-      pxByFrame: 6,
+      pxByFrameDefault: 5,
+      pxByFrame: 0,
       failed: false,
       add: {
         x: 0,
@@ -48,6 +49,7 @@ export default {
   computed: {},
   methods: {
     start(e) {
+      this.pxByFrame = this.pxByFrameDefault
       this.isStarted = true
       this.failed = false
       this.darkScreenIsVisible = false
@@ -79,10 +81,16 @@ export default {
             topBarRect.left < this.ballX && this.ballX < topBarRect.right
 
           if (this.ballX < this.ballHalf) {
-            this.add.x = this.pxByFrame
+            if (this.add.x !== this.pxByFrame) {
+              this.add.x = this.pxByFrame
+              this.addXChange()
+            }
           }
           if (windowInnerWidthMinusBallHalf < this.ballX) {
-            this.add.x = this.pxByFrame * -1
+            if (this.add.x !== this.pxByFrame * -1) {
+              this.add.x = this.pxByFrame * -1
+              this.addXChange()
+            }
           }
           if (inBarWidth) {
             if (this.ballY < barHeightBallHalf) {
@@ -99,6 +107,9 @@ export default {
           this.ballY += this.add.y
         }, 20)
       }
+    },
+    addXChange() {
+      this.pxByFrame += 1
     },
     mousemove(e) {
       if (!this.isStarted) return
