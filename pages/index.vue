@@ -124,6 +124,7 @@ export default {
 .container {
   position: relative;
   height: 100vh;
+  background-image: linear-gradient(#cff, #fff);
 }
 .ball {
   position: absolute;
