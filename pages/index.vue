@@ -1,10 +1,21 @@
 <template>
   <div class="container" @mousemove="mousemove">
-    <div class="bar top-bar" :style="{ left: x + 'px' }"></div>
-    <div class="ball" :style="{ left: ballX + 'px', top: ballY + 'px' }"></div>
-    <div class="bar bottom-bar" :style="{ left: x + 'px' }"></div>
+    <div id="top-bar" class="bar top-bar" :style="{ left: x + 'px' }"></div>
+    <div
+      id="ball"
+      class="ball"
+      :style="{ left: ballX + 'px', top: ballY + 'px' }"
+    ></div>
+    <div
+      id="bottom-bar"
+      class="bar bottom-bar"
+      :style="{ left: x + 'px' }"
+    ></div>
     <div v-show="darkScreenIsVisible || failed" class="dark-screen">
-      <button class="start-button" @click="start">START</button>
+      <p v-show="failed" class="failed">Failed!</p>
+      <button class="start-button" @click="start">
+        <span v-show="isPlayed">RE</span>START
+      </button>
     </div>
   </div>
 </template>
@@ -17,6 +28,7 @@ export default {
   data() {
     return {
       isStarted: false,
+      isPlayed: false,
       darkScreenIsVisible: true,
       initialX: 0,
       x: '50%',
@@ -25,7 +37,8 @@ export default {
       ballHalf: 0,
       ballX: '50%',
       ballY: '50%',
-      pxByFrame: 3,
+      pxByFrame: 6,
+      failed: false,
       add: {
         x: 0,
         y: 0
@@ -36,46 +49,56 @@ export default {
   methods: {
     start(e) {
       this.isStarted = true
+      this.failed = false
       this.darkScreenIsVisible = false
       this.initialX = e.pageX
-      const barElm = document.querySelector('.bar')
-      const ballElm = document.querySelector('.ball')
-      this.barHalfWidth = barElm.clientWidth / 2
-      this.barHeight = barElm.clientHeight
+      const topBarElm = document.getElementById('top-bar')
+      // const bottomBarElm = document.getElementById('bottom-bar')
+      const ballElm = document.getElementById('ball')
+      this.barHalfWidth = topBarElm.clientWidth / 2
+      this.barHeight = topBarElm.clientHeight
       this.ballHalf = ballElm.clientWidth / 2
       const barHeightBallHalf = this.barHeight + this.ballHalf
       this.ballX = window.innerWidth / 2
       this.ballY = window.innerHeight / 2
       this.add.x = this.pxByFrame
       this.add.y = this.pxByFrame
-      setInterval(() => {
-        const windowInnerHeightMinusBarHeightBallHalf =
-          window.innerHeight - barHeightBallHalf
-        const windowInnerWidthMinusBallHalf = window.innerWidth - this.ballHalf
-        const barRect = barElm.getBoundingClientRect()
-        // const ballRect = ballRect.getBoundingClientRect()
-        const inBarXY = barRect.right < this.ballX || this.ballX < barRect.right
-        if (inBarXY) {
+      if (!this.isPlayed) {
+        this.isPlayed = true
+        setInterval(() => {
+          if (!this.isStarted) return
+          const windowInnerHeight = window.innerHeight
+          const windowInnerHeightMinusBarHeightBallHalf =
+            windowInnerHeight - barHeightBallHalf
+          const windowInnerWidthMinusBallHalf =
+            window.innerWidth - this.ballHalf
+          const topBarRect = topBarElm.getBoundingClientRect()
+          // const bottomBarRect = bottomBarElm.getBoundingClientRect()
+          // const ballRect = ballRect.getBoundingClientRect()
+          const inBarWidth =
+            topBarRect.left < this.ballX && this.ballX < topBarRect.right
+
           if (this.ballX < this.ballHalf) {
             this.add.x = this.pxByFrame
           }
           if (windowInnerWidthMinusBallHalf < this.ballX) {
             this.add.x = this.pxByFrame * -1
           }
-          if (this.ballY < barHeightBallHalf) {
-            this.add.y = this.pxByFrame
+          if (inBarWidth) {
+            if (this.ballY < barHeightBallHalf) {
+              this.add.y = this.pxByFrame
+            }
+            if (windowInnerHeightMinusBarHeightBallHalf < this.ballY) {
+              this.add.y = this.pxByFrame * -1
+            }
+          } else if (this.ballY < 0 || windowInnerHeight < this.ballY) {
+            this.failed = true
+            this.isStarted = false
           }
-          if (windowInnerHeightMinusBarHeightBallHalf < this.ballY) {
-            this.add.y = this.pxByFrame * -1
-          }
-        }
-        this.ballX += this.add.x
-        this.ballY += this.add.y
-
-        // if (true) {
-        //   this.failed = true
-        // }
-      }, 20)
+          this.ballX += this.add.x
+          this.ballY += this.add.y
+        }, 20)
+      }
     },
     mousemove(e) {
       if (!this.isStarted) return
@@ -136,7 +159,17 @@ export default {
   width: 100%;
   height: 100%;
 }
-
+.failed {
+  font-size: 40px;
+  font-weight: bold;
+  color: red;
+  position: absolute;
+  top: 20%;
+  text-align: center;
+  left: 0;
+  width: 100%;
+  z-index: 20;
+}
 .start-button {
   font-size: 30px;
   font-weight: bold;
